@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://weluiq846o2x"]
+
+[sub_resource type="GDScript" id="GDScript_g40xn"]
+script/source = "
+@tool
+extends RigidBody2D
+
+@export var state:int = 0
+@export var age:int = 0
+
+func _enter_tree():
+	var new_name:String = get_scene_file_path().get_file().trim_suffix(\".tscn\")
+	set_name.call_deferred(new_name)
+
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xyohc"]
+radius = 4.0
+
+[node name="Factors" type="RigidBody2D" groups=["factors"]]
+collision_layer = 2
+collision_mask = 2
+mass = 0.1
+gravity_scale = 0.0
+max_contacts_reported = 2
+contact_monitor = true
+linear_damp = 1.0
+angular_damp = 1.0
+script = SubResource("GDScript_g40xn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xyohc")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+scale = Vector2(0.4, 0.404145)
+color = Color(1, 0.290196, 0, 1)
+polygon = PackedVector2Array(10, 0, 5, 8.66025, -5, 8.66025, -10, 1.22465e-15, -5, -8.66025, 5, -8.66025)

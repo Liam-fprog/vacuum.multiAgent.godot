@@ -1,0 +1,152 @@
+[gd_scene load_steps=13 format=3 uid="uid://gbfhv38mowje"]
+
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/behavior_tree_for_groups.gd" id="1_ty85y"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/behavior.gd" id="2_r87fs"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/sequential.gd" id="3_1a2m6"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_step_between.gd" id="4_t67sr"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/add_spring_on_contact.gd" id="4_u81ky"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/stay_in_box.gd" id="4_wcjs1"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/force_random.gd" id="4_xxsde"]
+[ext_resource type="PackedScene" uid="uid://cmh2j5wto6rrp" path="res://examples/various/agent_b.tscn" id="5_di58j"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_proba.gd" id="6_q137f"]
+[ext_resource type="PackedScene" uid="uid://cnp1sb4hijc2o" path="res://examples/various/agent_c.tscn" id="6_qqbgm"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/delete.gd" id="7_3e5lb"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ccvj4"]
+flip_faces = true
+
+[node name="ExampleCrowdMvt1" type="Node3D"]
+
+[node name="BehavTreeForGroups" type="Node" parent="."]
+script = ExtResource("1_ty85y")
+
+[node name="Agent-B" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_r87fs")
+on_group = "Agent-B"
+
+[node name="MvtRandom" type="Node" parent="BehavTreeForGroups/Agent-B"]
+script = ExtResource("3_1a2m6")
+
+[node name="IfStepBetween" type="Node" parent="BehavTreeForGroups/Agent-B/MvtRandom"]
+script = ExtResource("4_t67sr")
+step_end = 100000
+
+[node name="ForceRandom" type="Node" parent="BehavTreeForGroups/Agent-B/MvtRandom"]
+script = ExtResource("4_xxsde")
+
+[node name="DeathRandom" type="Node" parent="BehavTreeForGroups/Agent-B"]
+script = ExtResource("3_1a2m6")
+
+[node name="IfStepBetween" type="Node" parent="BehavTreeForGroups/Agent-B/DeathRandom"]
+script = ExtResource("4_t67sr")
+step_start = 100000
+step_end = 100000000
+
+[node name="IfProba" type="Node" parent="BehavTreeForGroups/Agent-B/DeathRandom"]
+script = ExtResource("6_q137f")
+proba = 0.001
+
+[node name="Delete" type="Node" parent="BehavTreeForGroups/Agent-B/DeathRandom"]
+script = ExtResource("7_3e5lb")
+
+[node name="AddSpringOnContact" type="Node" parent="BehavTreeForGroups/Agent-B"]
+script = ExtResource("4_u81ky")
+with_group = "Agent-C"
+
+[node name="StayInBox" type="Node" parent="BehavTreeForGroups/Agent-B"]
+script = ExtResource("4_wcjs1")
+min = Vector3(-1, -1, -1)
+max = Vector3(1, 1, 1)
+
+[node name="Agent-C" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_r87fs")
+on_group = "Agent-C"
+
+[node name="Sequential" type="Node" parent="BehavTreeForGroups/Agent-C"]
+script = ExtResource("3_1a2m6")
+
+[node name="IfStepBetween" type="Node" parent="BehavTreeForGroups/Agent-C/Sequential"]
+script = ExtResource("4_t67sr")
+step_end = 100000
+
+[node name="ForceRandom" type="Node" parent="BehavTreeForGroups/Agent-C/Sequential"]
+script = ExtResource("4_xxsde")
+
+[node name="StayInBox" type="Node" parent="BehavTreeForGroups/Agent-C"]
+script = ExtResource("4_wcjs1")
+min = Vector3(-1, -1, -1)
+max = Vector3(1, 1, 1)
+
+[node name="Agent-B" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B2" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B3" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B4" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B5" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B6" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B7" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-B8" parent="." instance=ExtResource("5_di58j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.369118, -0.0464584, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C2" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C3" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C4" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C5" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C6" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C7" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Agent-C8" parent="." instance=ExtResource("6_qqbgm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.412403, 0.0459936, 0)
+gravity_scale = 0.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.890372, 0.455234, 0, -0.455234, 0.890372, 0, 1.04184, 2.29168)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.180794, 0.983521, 0, -0.983521, 0.180794, 0, 0, 10.7686)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+mesh = SubResource("BoxMesh_ccvj4")

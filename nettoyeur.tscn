@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://cnwfkqx74w615"]
+
+[ext_resource type="Script" uid="uid://bfpj5ydclpqgx" path="res://addons/behav_tree_for_groups/behavior.gd" id="1_cklvc"]
+[ext_resource type="PackedScene" uid="uid://ce1f2c3j3cqn3" path="res://Aspirateur.tscn" id="2_au4i5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v8v6g"]
+size = Vector3(64, 0, 64)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_au4i5"]
+size = Vector2(64, 64)
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_cklvc"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_au4i5"]
+
+[node name="Nettoyeur" type="Node3D"]
+
+[node name="Sol" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Sol"]
+shape = SubResource("BoxShape3D_v8v6g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Sol"]
+mesh = SubResource("PlaneMesh_au4i5")
+
+[node name="Grille" type="Node" parent="."]
+script = ExtResource("1_cklvc")
+metadata/_custom_type_script = "uid://bfpj5ydclpqgx"
+
+[node name="GridMap" type="GridMap" parent="Grille"]
+mesh_library = SubResource("MeshLibrary_cklvc")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.0067019714, 0.9999775, 0, -0.9999775, 0.0067019714, -3.5312207, 70.02466, 0.7207222)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -0.023978485, 0.9997125, 0, -0.9997125, -0.023978485, 0, 42.011208, 0)
+
+[node name="Aspirateur" parent="." instance=ExtResource("2_au4i5")]
+transform = Transform3D(1.3184518, 0, 0, 0, 1.2719942, 0, 0, 0, 1.3015045, 8.800251, 0.6359971, -8.704561)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(42.356133, 0, 0, 0, 1, 0, 0, 0, 2.1260622, -37.538197, 0, -10.123746)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(2, 0, 0, 0, 1, 0, 0, 0, 1, 1.7944663, 0, -14.582014)
+shape = SubResource("BoxShape3D_au4i5")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]

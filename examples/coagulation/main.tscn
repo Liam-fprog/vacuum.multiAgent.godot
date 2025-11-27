@@ -1,0 +1,730 @@
+[gd_scene load_steps=23 format=3 uid="uid://d2rbou6dglon"]
+
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/behavior_tree_for_groups.gd" id="1_7is1p"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/behavior.gd" id="2_2sk4m"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/force_random.gd" id="3_l1p6k"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/force_global.gd" id="4_6rl2b"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/stay_in_box.gd" id="5_tu27f"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/force_to_grid_value.gd" id="6_lvsry"]
+[ext_resource type="PackedScene" uid="uid://8d1mmxxnxnxy" path="res://examples/coagulation/lesion.tscn" id="7_6b6ua"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/sequential.gd" id="7_ebejv"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_state_equals.gd" id="8_3soh5"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_grid_2d_value_sup.gd" id="9_r2eax"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/set_state.gd" id="10_km0xp"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/change_color.gd" id="11_c6gdq"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/add_spring_on_contact.gd" id="12_2j8ip"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_proba.gd" id="14_1o72l"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/set_grid_value_2d.gd" id="16_7my84"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/print_message.gd" id="16_70ee2"]
+[ext_resource type="PackedScene" uid="uid://c7hylydq3sl81" path="res://examples/coagulation/platelet.tscn" id="16_loo5f"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/if_collision.gd" id="17_n33my"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/add_agent.gd" id="18_6uqll"]
+[ext_resource type="Script" path="res://addons/behav_tree_for_groups/delete.gd" id="18_xuqnk"]
+[ext_resource type="PackedScene" uid="uid://yq5y0be22p2p" path="res://examples/coagulation/grid_2d_0.tscn" id="20_3fwqe"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_esw5c"]
+
+[node name="Coagulation" type="Node2D"]
+
+[node name="BehavTreeForGroups" type="Node" parent="."]
+script = ExtResource("1_7is1p")
+
+[node name="Circulating" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_2sk4m")
+on_group = "circulating"
+
+[node name="ForceRandom" type="Node" parent="BehavTreeForGroups/Circulating"]
+script = ExtResource("3_l1p6k")
+F = Vector3(1, 1, 0)
+
+[node name="ForceGlobal" type="Node" parent="BehavTreeForGroups/Circulating" groups=["FA", "circulating"]]
+script = ExtResource("4_6rl2b")
+fx = 0.5
+
+[node name="StayInBox" type="Node" parent="BehavTreeForGroups/Circulating"]
+script = ExtResource("5_tu27f")
+min = Vector3(0, 100, 0)
+max = Vector3(1130, 600, 0)
+
+[node name="OutOfBox" type="Node" parent="BehavTreeForGroups/Circulating"]
+script = ExtResource("7_ebejv")
+
+[node name="IfCollision" type="Node" parent="BehavTreeForGroups/Circulating/OutOfBox"]
+script = ExtResource("17_n33my")
+with_group = "FinVeine"
+
+[node name="Delete" type="Node" parent="BehavTreeForGroups/Circulating/OutOfBox"]
+script = ExtResource("18_xuqnk")
+
+[node name="Platelets" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_2sk4m")
+on_group = "platelet"
+
+[node name="GoToLesion" type="Node" parent="BehavTreeForGroups/Platelets"]
+script = ExtResource("6_lvsry")
+on_grid_group = "grd"
+value_to_go = 1.0
+force = 1.0
+
+[node name="Activation" type="Node" parent="BehavTreeForGroups/Platelets"]
+script = ExtResource("7_ebejv")
+
+[node name="IfStateEquals_0" type="Node" parent="BehavTreeForGroups/Platelets/Activation"]
+script = ExtResource("8_3soh5")
+
+[node name="IfGridValueIsSup" type="Node" parent="BehavTreeForGroups/Platelets/Activation"]
+script = ExtResource("9_r2eax")
+on_grid_group = "grd"
+is_sup_to = 0.5
+
+[node name="SetState_1" type="Node" parent="BehavTreeForGroups/Platelets/Activation"]
+script = ExtResource("10_km0xp")
+set_to_value = 1
+
+[node name="ChangeColor_cyan" type="Node" parent="BehavTreeForGroups/Platelets/Activation"]
+script = ExtResource("11_c6gdq")
+color = Color(0.298039, 1, 0.862745, 1)
+
+[node name="FixOnLesion" type="Node" parent="BehavTreeForGroups/Platelets"]
+script = ExtResource("7_ebejv")
+
+[node name="IfStateEquals_1" type="Node" parent="BehavTreeForGroups/Platelets/FixOnLesion"]
+script = ExtResource("8_3soh5")
+state_equals = 1
+
+[node name="AddSpring_with_fibro_1" type="Node" parent="BehavTreeForGroups/Platelets/FixOnLesion"]
+script = ExtResource("12_2j8ip")
+with_group = "fibro"
+spring_max_length = 5000.0
+max_links = 4
+
+[node name="SetState_2" type="Node" parent="BehavTreeForGroups/Platelets/FixOnLesion"]
+script = ExtResource("10_km0xp")
+set_to_value = 2
+
+[node name="ChangeColor_rose" type="Node" parent="BehavTreeForGroups/Platelets/FixOnLesion"]
+script = ExtResource("11_c6gdq")
+color = Color(0.996094, 0.585938, 0.910156, 1)
+
+[node name="FixOnPlatFixed" type="Node" parent="BehavTreeForGroups/Platelets"]
+script = ExtResource("7_ebejv")
+
+[node name="IfStateEquals" type="Node" parent="BehavTreeForGroups/Platelets/FixOnPlatFixed"]
+script = ExtResource("8_3soh5")
+state_equals = 1
+
+[node name="AddSpring_platelet" type="Node" parent="BehavTreeForGroups/Platelets/FixOnPlatFixed"]
+script = ExtResource("12_2j8ip")
+with_group = "platelet"
+in_state = 2
+spring_max_length = 5000.0
+max_links = 4
+
+[node name="PrintMessage" type="Node" parent="BehavTreeForGroups/Platelets/FixOnPlatFixed"]
+script = ExtResource("16_70ee2")
+message = "*** LINK ***"
+
+[node name="SetState_2" type="Node" parent="BehavTreeForGroups/Platelets/FixOnPlatFixed"]
+script = ExtResource("10_km0xp")
+set_to_value = 2
+
+[node name="ChangeColor_green" type="Node" parent="BehavTreeForGroups/Platelets/FixOnPlatFixed"]
+script = ExtResource("11_c6gdq")
+color = Color(0.505882, 0.866667, 0, 1)
+
+[node name="Fibrinolyse" type="Node" parent="BehavTreeForGroups/Platelets"]
+script = ExtResource("7_ebejv")
+
+[node name="IfProba" type="Node" parent="BehavTreeForGroups/Platelets/Fibrinolyse"]
+script = ExtResource("14_1o72l")
+
+[node name="IfStateEquals" type="Node" parent="BehavTreeForGroups/Platelets/Fibrinolyse"]
+script = ExtResource("8_3soh5")
+state_equals = 2
+
+[node name="IfCollision" type="Node" parent="BehavTreeForGroups/Platelets/Fibrinolyse"]
+script = ExtResource("17_n33my")
+with_group = "FA"
+
+[node name="Delete" type="Node" parent="BehavTreeForGroups/Platelets/Fibrinolyse"]
+script = ExtResource("18_xuqnk")
+
+[node name="Lesion" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_2sk4m")
+on_group = "fibro"
+
+[node name="ProdFactors" type="Node" parent="BehavTreeForGroups/Lesion"]
+script = ExtResource("7_ebejv")
+
+[node name="IfState_1" type="Node" parent="BehavTreeForGroups/Lesion/ProdFactors"]
+script = ExtResource("8_3soh5")
+state_equals = 1
+
+[node name="PutFactorsInGrid2D" type="Node" parent="BehavTreeForGroups/Lesion/ProdFactors"]
+script = ExtResource("16_7my84")
+on_grid_group = "grd"
+set_value = 1.0
+
+[node name="Unactivate_1" type="Node" parent="BehavTreeForGroups/Lesion"]
+script = ExtResource("7_ebejv")
+
+[node name="IfContact" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_1"]
+script = ExtResource("17_n33my")
+with_group = "platelet"
+in_state = 1
+
+[node name="SetState_0" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_1"]
+script = ExtResource("10_km0xp")
+
+[node name="ChangeColor" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_1"]
+script = ExtResource("11_c6gdq")
+color = Color(0.631373, 0.203922, 0, 1)
+
+[node name="Unactivate_2" type="Node" parent="BehavTreeForGroups/Lesion"]
+script = ExtResource("7_ebejv")
+
+[node name="IfContact" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_2"]
+script = ExtResource("17_n33my")
+with_group = "platelet"
+in_state = 2
+
+[node name="SetState_0" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_2"]
+script = ExtResource("10_km0xp")
+
+[node name="ChangeColor" type="Node" parent="BehavTreeForGroups/Lesion/Unactivate_2"]
+script = ExtResource("11_c6gdq")
+color = Color(0.631373, 0.203922, 0, 1)
+
+[node name="StartVein" type="Node" parent="BehavTreeForGroups"]
+script = ExtResource("2_2sk4m")
+on_group = "StartVein"
+
+[node name="AddPlatelets" type="Node" parent="BehavTreeForGroups/StartVein"]
+script = ExtResource("7_ebejv")
+
+[node name="IfProba" type="Node" parent="BehavTreeForGroups/StartVein/AddPlatelets"]
+script = ExtResource("14_1o72l")
+proba = 1.0
+
+[node name="AddAgent" type="Node" parent="BehavTreeForGroups/StartVein/AddPlatelets"]
+script = ExtResource("18_6uqll")
+agent_tscn = "res://examples/coagulation/platelet.tscn"
+
+[node name="AddFA" type="Node" parent="BehavTreeForGroups/StartVein"]
+script = ExtResource("7_ebejv")
+
+[node name="IfProba" type="Node" parent="BehavTreeForGroups/StartVein/AddFA"]
+script = ExtResource("14_1o72l")
+proba = 0.1
+
+[node name="AddAgent" type="Node" parent="BehavTreeForGroups/StartVein/AddFA"]
+script = ExtResource("18_6uqll")
+agent_tscn = "res://examples/coagulation/FA.tscn"
+
+[node name="grid_2d_0" parent="." groups=["grd"] instance=ExtResource("20_3fwqe")]
+offset_top = 66.0
+offset_right = 1150.0
+offset_bottom = 520.0
+baseColor = Color(0, 0.337255, 0.839216, 0.960784)
+diffusionRate = 0.8
+loop_x = true
+
+[node name="StartVein" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 5.0
+offset_top = 248.0
+offset_right = 45.0
+offset_bottom = 288.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein2" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 6.0
+offset_top = 204.0
+offset_right = 46.0
+offset_bottom = 244.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein3" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 5.0
+offset_top = 336.0
+offset_right = 45.0
+offset_bottom = 376.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein4" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 6.0
+offset_top = 292.0
+offset_right = 46.0
+offset_bottom = 332.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein5" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 8.0
+offset_top = 387.0
+offset_right = 48.0
+offset_bottom = 427.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein6" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 8.0
+offset_top = 160.0
+offset_right = 48.0
+offset_bottom = 200.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein6" type="ColorRect" parent="StartVein6" groups=["StartVein"]]
+layout_mode = 0
+offset_left = -4.0
+offset_top = -45.0
+offset_right = 36.0
+offset_bottom = -5.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein7" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 8.0
+offset_top = 475.0
+offset_right = 48.0
+offset_bottom = 515.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="StartVein8" type="ColorRect" parent="." groups=["StartVein"]]
+offset_left = 9.0
+offset_top = 431.0
+offset_right = 49.0
+offset_bottom = 471.0
+color = Color(1, 0, 0.282353, 1)
+
+[node name="EndOfVein" type="StaticBody2D" parent="." groups=["FinVeine"]]
+position = Vector2(1093.71, 0)
+
+[node name="ColorRect" type="ColorRect" parent="EndOfVein"]
+offset_right = 52.0
+offset_bottom = 646.0
+color = Color(0.0470588, 0, 0.45098, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EndOfVein"]
+position = Vector2(28, 327)
+scale = Vector2(2.53, 32.59)
+shape = SubResource("RectangleShape2D_esw5c")
+
+[node name="VeinLow" type="StaticBody2D" parent="."]
+position = Vector2(0, -106.59)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="VeinLow"]
+self_modulate = Color(0.945098, 1, 0.894118, 1)
+position = Vector2(44.1724, 16.6273)
+scale = Vector2(5.15945, 5.00745)
+build_mode = 1
+polygon = PackedVector2Array(-7.69231, 148.85, 213.846, 149.058, 213.654, 121.558, 182.692, 114.892, 164.615, 107.183, 143.612, 104.749, 120.328, 112.425, 89.1234, 111.826, 71.5385, 105.517, 26.5297, 105.324, 10.7692, 115.933, -8.07692, 123.333)
+
+[node name="Polygon2D" type="Polygon2D" parent="VeinLow"]
+position = Vector2(38.78, -9.15)
+scale = Vector2(5.21, 5.21)
+color = Color(0.356863, 0.2, 0.14902, 1)
+polygon = PackedVector2Array(-7.69231, 148.85, 213.846, 149.058, 213.654, 121.558, 182.692, 114.892, 164.615, 107.183, 143.612, 104.749, 120.577, 107.6, 99.0385, 108.433, 71.5385, 105.517, 26.5297, 105.324, 10.7692, 115.933, -8.07692, 123.333)
+
+[node name="Polygon2D2" type="Polygon2D" parent="VeinLow"]
+position = Vector2(38.78, -9.15)
+scale = Vector2(5.21, 5.21)
+color = Color(0.356863, 0.2, 0.14902, 1)
+polygon = PackedVector2Array(-7.69231, 148.85, 213.846, 149.058, 213.654, 121.558, 182.692, 114.892, 164.615, 107.183, 143.612, 104.749, 120.577, 107.6, 99.0385, 108.433, 71.5385, 105.517, 26.5297, 105.324, 10.7692, 115.933, -8.07692, 123.333)
+
+[node name="VeinUp" type="StaticBody2D" parent="."]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="VeinUp"]
+polygon = PackedVector2Array(0, 1, 1153, 1, 1153, 67, 887, 101, 779, 68, 598, 118, 516, 68, 445, 92, 385, 77, 298, 107, 216, 85, 122, 106, 46, 72, 0, 73, 0, 73)
+
+[node name="Polygon2D" type="Polygon2D" parent="VeinUp"]
+color = Color(0.356863, 0.2, 0.14902, 1)
+polygon = PackedVector2Array(0, 1, 1153, 1, 1153, 67, 887, 101, 779, 68, 598, 118, 514, 77, 442, 96, 384, 80, 300, 109, 221, 88, 122, 106, 46, 72, 0, 73, 0, 73)
+
+[node name="lesion" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(507, 436)
+age = 0
+
+[node name="lesion2" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(549, 437)
+age = 0
+
+[node name="lesion3" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(582, 440)
+age = 0
+
+[node name="lesion4" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(610, 438)
+age = 0
+
+[node name="lesion5" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(646, 442)
+age = 0
+
+[node name="lesion6" parent="." instance=ExtResource("7_6b6ua")]
+position = Vector2(683, 433)
+age = 0
+
+[node name="platelet" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(271, 426)
+age = 0
+
+[node name="platelet2" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(464, 424)
+age = 0
+
+[node name="platelet3" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(392, 419)
+age = 0
+
+[node name="platelet4" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(268, 385)
+age = 0
+
+[node name="platelet5" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(461, 383)
+age = 0
+
+[node name="platelet6" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(389, 378)
+age = 0
+
+[node name="platelet7" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(230, 403)
+age = 0
+
+[node name="platelet8" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(423, 401)
+age = 0
+
+[node name="platelet9" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(351, 396)
+age = 0
+
+[node name="platelet10" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(227, 362)
+age = 0
+
+[node name="platelet11" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(420, 360)
+age = 0
+
+[node name="platelet12" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(348, 355)
+age = 0
+
+[node name="platelet13" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(92, 355)
+age = 0
+
+[node name="platelet14" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(285, 353)
+age = 0
+
+[node name="platelet15" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(213, 348)
+age = 0
+
+[node name="platelet16" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(89, 314)
+age = 0
+
+[node name="platelet17" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(282, 312)
+age = 0
+
+[node name="platelet18" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(210, 307)
+age = 0
+
+[node name="platelet19" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(51, 332)
+age = 0
+
+[node name="platelet20" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(244, 330)
+age = 0
+
+[node name="platelet21" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(172, 325)
+age = 0
+
+[node name="platelet22" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(48, 291)
+age = 0
+
+[node name="platelet23" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(241, 289)
+age = 0
+
+[node name="platelet24" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(169, 284)
+age = 0
+
+[node name="platelet25" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(119, 418)
+age = 0
+
+[node name="platelet26" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(312, 416)
+age = 0
+
+[node name="platelet27" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(240, 411)
+age = 0
+
+[node name="platelet28" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(116, 377)
+age = 0
+
+[node name="platelet29" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(309, 375)
+age = 0
+
+[node name="platelet30" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(237, 370)
+age = 0
+
+[node name="platelet31" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(78, 395)
+age = 0
+
+[node name="platelet32" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(271, 393)
+age = 0
+
+[node name="platelet33" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(199, 388)
+age = 0
+
+[node name="platelet34" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(75, 354)
+age = 0
+
+[node name="platelet35" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(268, 352)
+age = 0
+
+[node name="platelet36" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(196, 347)
+age = 0
+
+[node name="platelet37" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(304, 250)
+age = 0
+
+[node name="platelet38" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(301, 209)
+age = 0
+
+[node name="platelet39" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(166, 202)
+age = 0
+
+[node name="platelet40" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(287, 195)
+age = 0
+
+[node name="platelet41" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(163, 161)
+age = 0
+
+[node name="platelet42" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(284, 154)
+age = 0
+
+[node name="platelet43" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(125, 179)
+age = 0
+
+[node name="platelet44" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(318, 177)
+age = 0
+
+[node name="platelet45" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(246, 172)
+age = 0
+
+[node name="platelet46" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(122, 138)
+age = 0
+
+[node name="platelet47" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(315, 136)
+age = 0
+
+[node name="platelet48" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(243, 131)
+age = 0
+
+[node name="platelet49" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(193, 265)
+age = 0
+
+[node name="platelet50" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(314, 258)
+age = 0
+
+[node name="platelet51" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(190, 224)
+age = 0
+
+[node name="platelet52" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(311, 217)
+age = 0
+
+[node name="platelet53" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(152, 242)
+age = 0
+
+[node name="platelet54" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(273, 235)
+age = 0
+
+[node name="platelet55" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(149, 201)
+age = 0
+
+[node name="platelet56" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(270, 194)
+age = 0
+
+[node name="platelet57" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(769, 148)
+age = 0
+
+[node name="platelet58" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(697, 143)
+age = 0
+
+[node name="platelet59" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(784, 404)
+age = 0
+
+[node name="platelet60" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(977, 402)
+age = 0
+
+[node name="platelet61" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(905, 397)
+age = 0
+
+[node name="platelet62" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(781, 363)
+age = 0
+
+[node name="platelet63" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(974, 361)
+age = 0
+
+[node name="platelet64" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(902, 356)
+age = 0
+
+[node name="platelet65" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(743, 381)
+age = 0
+
+[node name="platelet66" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(936, 379)
+age = 0
+
+[node name="platelet67" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(864, 374)
+age = 0
+
+[node name="platelet68" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(740, 340)
+age = 0
+
+[node name="platelet69" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(933, 338)
+age = 0
+
+[node name="platelet70" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(861, 333)
+age = 0
+
+[node name="platelet71" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(605, 333)
+age = 0
+
+[node name="platelet72" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(798, 331)
+age = 0
+
+[node name="platelet73" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(726, 326)
+age = 0
+
+[node name="platelet74" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(632, 396)
+age = 0
+
+[node name="platelet75" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(825, 394)
+age = 0
+
+[node name="platelet76" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(753, 389)
+age = 0
+
+[node name="platelet77" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(629, 355)
+age = 0
+
+[node name="platelet78" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(822, 353)
+age = 0
+
+[node name="platelet79" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(750, 348)
+age = 0
+
+[node name="platelet80" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(591, 373)
+age = 0
+
+[node name="platelet81" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(784, 371)
+age = 0
+
+[node name="platelet82" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(712, 366)
+age = 0
+
+[node name="platelet83" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(588, 332)
+age = 0
+
+[node name="platelet84" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(781, 330)
+age = 0
+
+[node name="platelet85" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(709, 325)
+age = 0
+
+[node name="platelet86" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(519, 147)
+age = 0
+
+[node name="platelet87" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(712, 145)
+age = 0
+
+[node name="platelet88" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(640, 140)
+age = 0
+
+[node name="platelet89" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(478, 124)
+age = 0
+
+[node name="platelet90" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(671, 122)
+age = 0
+
+[node name="platelet91" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(599, 117)
+age = 0
+
+[node name="platelet92" parent="." instance=ExtResource("16_loo5f")]
+position = Vector2(652, 322)
+age = 0
